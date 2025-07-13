@@ -32,15 +32,38 @@ app.use('/api/', limiter);
 
 // Health check (no auth required)
 app.get('/health', async (req, res) => {
+  const missingVars = [];
+  
+  // Check required environment variables
+  if (!process.env.EXASOL_PAT && !process.env.EXASOL_PASSWORD) {
+    missingVars.push('EXASOL_PAT');
+  }
+  if (!process.env.EXASOL_HOST) {
+    missingVars.push('EXASOL_HOST');
+  }
+  if (!process.env.EXASOL_USER) {
+    missingVars.push('EXASOL_USER');
+  }
+  
+  // If critical environment variables are missing, return unhealthy
+  if (missingVars.length > 0) {
+    return res.status(503).json({
+      healthy: false,
+      status: 'not_configured',
+      message: 'Missing required environment variables',
+      missing: missingVars,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
   try {
     const health = await pool.getHealth();
     res.status(health.healthy ? 200 : 503).json(health);
   } catch (error) {
-    // Return basic health status even if pool isn't ready
-    res.status(200).json({
-      healthy: true,
-      status: 'running',
-      message: 'Service is running (database not configured)',
+    res.status(503).json({
+      healthy: false,
+      status: 'error',
+      message: error.message,
       timestamp: new Date().toISOString()
     });
   }
