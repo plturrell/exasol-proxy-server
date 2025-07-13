@@ -2,9 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies - using npm install for Railway
 COPY package.json ./
-RUN npm install --only=production
+RUN npm install --omit=dev
 
 # Copy source
 COPY src ./src

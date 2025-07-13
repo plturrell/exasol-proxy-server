@@ -41,10 +41,18 @@ export const config = {
   }
 };
 
-// Validate required config
+// Validate required config - but don't crash on startup
 const required = ['EXASOL_HOST', 'EXASOL_USER', 'EXASOL_PASSWORD'];
+const missing = [];
 for (const key of required) {
   if (!process.env[key] && key === 'EXASOL_PASSWORD' && !process.env.EXASOL_PAT) {
-    throw new Error(`Missing required environment variable: ${key} or EXASOL_PAT`);
+    missing.push(`${key} or EXASOL_PAT`);
+  } else if (!process.env[key] && key !== 'EXASOL_PASSWORD') {
+    missing.push(key);
   }
+}
+
+if (missing.length > 0) {
+  console.warn(`⚠️  Missing environment variables: ${missing.join(', ')}`);
+  console.warn('The service will start but database operations will fail.');
 }
