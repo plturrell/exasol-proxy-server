@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: exasol-proxy-server
+    runtime: node
+    buildCommand: npm install
+    startCommand: node src/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: EXASOL_HOST
+        sync: false
+      - key: EXASOL_PORT
+        sync: false
+      - key: EXASOL_USER
+        sync: false
+      - key: EXASOL_PAT
+        sync: false
+      - key: EXASOL_SCHEMA
+        sync: false
+      - key: API_KEYS
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false

@@ -4,15 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
-// Debug: Log environment variables (redacted)
-console.log('=== Environment variables loaded ===');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('PORT:', process.env.PORT);
-console.log('EXASOL_HOST:', process.env.EXASOL_HOST);
-console.log('EXASOL_USER:', process.env.EXASOL_USER);
-console.log('EXASOL_PAT:', process.env.EXASOL_PAT ? '[REDACTED]' : undefined);
-console.log('EXASOL_PASSWORD:', process.env.EXASOL_PASSWORD ? '[REDACTED]' : undefined);
-console.log('Build timestamp:', new Date().toISOString());
+// Environment loaded
 
 export const config = {
   env: process.env.NODE_ENV || 'development',
