@@ -2,7 +2,7 @@
 nixPkgs = ["nodejs-18_x"]
 
 [phases.install]
-cmds = ["npm install"]
+cmds = ["npm ci --production"]
 
 [start]
-cmd = "npm start"
+cmd = "node index.js"
