@@ -32,6 +32,12 @@ class ExasolConnection {
 
       this.ws.on('open', () => {
         logger.debug(`Connection ${this.id} opened`);
+        // Send initial login command to trigger public key response
+        const initCommand = {
+          command: 'login',
+          protocolVersion: 3
+        };
+        this.ws.send(JSON.stringify(initCommand));
       });
 
       this.ws.on('message', async (data) => {
