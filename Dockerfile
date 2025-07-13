@@ -7,6 +7,7 @@ COPY package.json ./
 RUN npm install --omit=dev
 
 # Copy source
+COPY index.js ./
 COPY src ./src
 
 # Create non-root user
