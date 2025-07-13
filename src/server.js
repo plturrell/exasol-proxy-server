@@ -30,6 +30,57 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// Network diagnostic endpoint
+app.get('/network-test', async (req, res) => {
+  const net = await import('net');
+  const dns = await import('dns/promises');
+  
+  const results = {
+    dns: {},
+    tcp: {},
+    websocket: {}
+  };
+  
+  try {
+    // Test DNS resolution
+    const addresses = await dns.resolve4(config.exasol.host);
+    results.dns = {
+      success: true,
+      addresses: addresses,
+      host: config.exasol.host
+    };
+    
+    // Test TCP connectivity
+    const tcpTest = await new Promise((resolve) => {
+      const socket = new net.Socket();
+      const timeout = setTimeout(() => {
+        socket.destroy();
+        resolve({ success: false, error: 'TCP connection timeout' });
+      }, 5000);
+      
+      socket.connect(config.exasol.port, addresses[0], () => {
+        clearTimeout(timeout);
+        socket.destroy();
+        resolve({ success: true, message: 'TCP connection successful' });
+      });
+      
+      socket.on('error', (err) => {
+        clearTimeout(timeout);
+        resolve({ success: false, error: err.message });
+      });
+    });
+    results.tcp = tcpTest;
+    
+  } catch (error) {
+    results.dns = {
+      success: false,
+      error: error.message
+    };
+  }
+  
+  res.json(results);
+});
+
 // Test connection endpoint
 app.get('/test-connection', async (req, res) => {
   const testConfig = {
