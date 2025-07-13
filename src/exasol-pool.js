@@ -22,7 +22,10 @@ class ExasolConnection {
       const protocol = this.config.encryption ? 'wss' : 'ws';
       const url = `${protocol}://${this.config.host}:${this.config.port}`;
       
+      logger.info(`Attempting to connect to Exasol at ${url}`);
+      
       const timeout = setTimeout(() => {
+        logger.error(`Connection timeout after ${this.config.pool.connectionTimeout}ms to ${url}`);
         reject(new Error('Connection timeout'));
       }, this.config.pool.connectionTimeout);
 

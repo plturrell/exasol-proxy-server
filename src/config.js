@@ -18,7 +18,7 @@ export const config = {
       max: parseInt(process.env.POOL_MAX || '10'),
       idleTimeout: parseInt(process.env.POOL_IDLE_TIMEOUT || '300000'), // 5 minutes
       acquireTimeout: parseInt(process.env.POOL_ACQUIRE_TIMEOUT || '30000'), // 30 seconds
-      connectionTimeout: parseInt(process.env.CONNECTION_TIMEOUT || '10000'), // 10 seconds
+      connectionTimeout: parseInt(process.env.CONNECTION_TIMEOUT || '30000'), // 30 seconds
       healthCheckInterval: parseInt(process.env.HEALTH_CHECK_INTERVAL || '60000') // 1 minute
     }
   },

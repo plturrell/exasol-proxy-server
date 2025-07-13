@@ -30,6 +30,60 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// Test connection endpoint
+app.get('/test-connection', async (req, res) => {
+  const testConfig = {
+    host: config.exasol.host,
+    port: config.exasol.port,
+    hasCredentials: !!config.exasol.password,
+    encryption: config.exasol.encryption,
+    url: `${config.exasol.encryption ? 'wss' : 'ws'}://${config.exasol.host}:${config.exasol.port}`
+  };
+  
+  try {
+    // Try to create a test WebSocket connection
+    const WebSocket = (await import('ws')).default;
+    const ws = new WebSocket(testConfig.url, {
+      rejectUnauthorized: false,
+      handshakeTimeout: 10000
+    });
+    
+    const timeout = setTimeout(() => {
+      ws.close();
+      res.status(503).json({
+        success: false,
+        error: 'Connection timeout after 10 seconds',
+        config: testConfig
+      });
+    }, 10000);
+    
+    ws.on('open', () => {
+      clearTimeout(timeout);
+      ws.close();
+      res.json({
+        success: true,
+        message: 'WebSocket connection successful',
+        config: testConfig
+      });
+    });
+    
+    ws.on('error', (error) => {
+      clearTimeout(timeout);
+      res.status(503).json({
+        success: false,
+        error: error.message,
+        config: testConfig
+      });
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      config: testConfig
+    });
+  }
+});
+
 // Health check (no auth required)
 app.get('/health', async (req, res) => {
   const missingVars = [];
